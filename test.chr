@@ -1,0 +1,19 @@
+funct main() {
+	funct inner(param: String) => print(param)
+
+	inner("Hello, World!")
+}
+
+<#
+funct with_generics[T](param: T) {
+	# stuff here
+}
+
+funct with_lifetimes<lt>(param: ~<lt>i32) {
+	# stuff here
+}
+
+funct with_generics_and_lifetimes<lt>[T](param: ~<lt>T) {
+	# stuff here
+}
+#>
