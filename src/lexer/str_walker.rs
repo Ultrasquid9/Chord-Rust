@@ -128,6 +128,19 @@ impl<'input> StrWalker<'input> {
 		);
 	}
 
+	/// Jumps backwards by the provided amount of bytes.
+	/// # Panics
+	/// Panics if the index does not land on a valid char boundary.
+	pub fn jump_back(&mut self, amount: usize) {
+		self.index -= amount;
+
+		assert!(
+			self.input.is_char_boundary(self.index),
+			"{} is not a valid char boundary",
+			self.index
+		);
+	}
+
 	/// Increases the index until it reaches a char that is not whitespace
 	pub fn jump_whitespace(&mut self) {
 		let mut og_index = self.index;

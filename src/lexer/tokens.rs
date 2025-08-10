@@ -1,5 +1,6 @@
 use crate::lexer::TokenTree;
 
+// Mildly hacky macro to reduce repetition in the token map
 macro_rules! token_map {
 	( $( $name:tt : $type:ident $token:ident ),+ $(,)? ) => {
 		&[ $( ($name, Token::$type($type::$token) ), )+ ]
@@ -32,6 +33,12 @@ pub const TOKEN_MAP: &[(&str, Token)] = token_map! [
 	"break": Keyword Break,
 	"continue": Keyword Continue,
 	"return": Keyword Return,
+
+	"mut": Keyword Mut,
+	"fun": Keyword Fun,
+	"try": Keyword Try,
+	"yeet": Keyword Yeet,
+	"unsafe": Keyword Unsafe,
 
 	"->": Symbol Arrow,
 	"=>": Symbol BigArrow,
@@ -114,6 +121,13 @@ pub enum Keyword {
 	Break,
 	Continue,
 	Return,
+
+	// Reserved keywords, may get an official use eventually
+	Mut,
+	Fun,
+	Try,
+	Yeet,
+	Unsafe,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

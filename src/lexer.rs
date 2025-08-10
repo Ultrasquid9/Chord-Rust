@@ -4,10 +4,12 @@ use tokens::Token;
 use unicode_ident::{is_xid_continue, is_xid_start};
 
 use crate::lexer::{
+	parse_literals::parse_literals,
 	str_walker::StrWalker,
 	tokens::{DELIMITER_MAP, TOKEN_MAP},
 };
 
+mod parse_literals;
 mod str_walker;
 pub mod tokens;
 
@@ -15,6 +17,7 @@ pub mod tokens;
 pub enum LexErr {
 	UnknownErr,
 	UnbalancedNestingErr { start: String, end: String },
+	ParseLiteralErr { typ: String, string: String },
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -89,6 +92,10 @@ impl FromStr for TokenTree {
 			if current_ident.is_empty() {
 				if is_xid_start(ch) {
 					current_ident.push(ch);
+				} else {
+					// Literals
+					walker.jump_back(ch.len_utf8());
+					tokens.push(Token::Literal(parse_literals(&mut walker)?));
 				}
 			} else if is_xid_continue(ch) {
 				current_ident.push(ch);
