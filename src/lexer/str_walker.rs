@@ -10,7 +10,7 @@ impl<'input> StrWalker<'input> {
 		Self { input, index: 0 }
 	}
 
-	/// Increases the internal index of the [StrWalker], returning the current [char] in the process.
+	/// Increases the index, returning the current [char] in the process.
 	pub fn next_char(&mut self) -> Option<char> {
 		if self.reached_end() {
 			return None;
@@ -34,7 +34,7 @@ impl<'input> StrWalker<'input> {
 		}
 	}
 
-	/// Whether or not the internal index has reached or passed the length of the [str].
+	/// Whether or not the index has reached or passed the length of the [str].
 	pub fn reached_end(&self) -> bool {
 		self.index > self.input.len()
 	}
@@ -84,7 +84,7 @@ impl<'input> StrWalker<'input> {
 		}
 	}
 
-	/// Checks if the internal index is at the start of a pattern matching the target [str].
+	/// Checks if the index is at the start of a pattern matching the target [str].
 	pub fn currently_starts_with(&self, cmp: &str) -> bool {
 		// Using wrapping_add, then checking the result, seems to be faster than
 		// just using a normal add (likely because it doesn't panic)
@@ -103,12 +103,10 @@ impl<'input> StrWalker<'input> {
 	pub fn jump_by(&mut self, amount: usize) {
 		self.index += amount;
 
-		if !self.input.is_char_boundary(self.index) {
-			panic!("{} is not a valid char boundary", self.index)
-		}
+		assert!(self.input.is_char_boundary(self.index), "{} is not a valid char boundary", self.index);
 	}
 
-	/// Increases the internal index until it reaches a char that is not whitespace
+	/// Increases the index until it reaches a char that is not whitespace
 	pub fn jump_whitespace(&mut self) {
 		let mut og_index = self.index;
 
