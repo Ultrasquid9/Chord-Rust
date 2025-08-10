@@ -68,7 +68,14 @@ pub const TOKEN_MAP: &[(&str, Token)] = token_map! [
 	"@": Symbol Deref,
 ];
 
-#[derive(Debug)]
+pub const DELIMITER_MAP: &[(&str, &str, Delimiter)] = &[
+	("{", "}", Delimiter::CurlyBraces),
+	("(", ")", Delimiter::Parentheses),
+	("[", "]", Delimiter::SquareBrackets),
+	("<", ">", Delimiter::AngleBrackets),
+];
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Token {
 	Keyword(Keyword),
 	Symbol(Symbol),
@@ -80,7 +87,7 @@ pub enum Token {
 	},
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Keyword {
 	Funct,
 	Struct,
@@ -109,7 +116,7 @@ pub enum Keyword {
 	Return,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Symbol {
 	Arrow,
 	BigArrow,
@@ -147,12 +154,12 @@ pub enum Symbol {
 	Deref,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Literal {
 	String(String),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Delimiter {
 	CurlyBraces,
 	Parentheses,

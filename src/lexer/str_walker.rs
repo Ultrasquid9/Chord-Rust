@@ -17,16 +17,24 @@ impl<'input> StrWalker<'input> {
 		}
 
 		let og_index = self.index;
+		self.index += 1;
 
 		loop {
-			self.index += 1;
-
 			if self.reached_end() || self.input.is_char_boundary(self.index) {
-				return self.input[og_index..self.index].chars().next();
+				return Some(
+					self.input
+						.get(og_index..self.index)?
+						.chars()
+						.next()
+						.expect("Should be a valid char!"),
+				);
 			}
+
+			self.index += 1;
 		}
 	}
 
+	/// Whether or not the internal index has reached or passed the length of the [str].
 	pub fn reached_end(&self) -> bool {
 		self.index > self.input.len()
 	}
@@ -48,15 +56,6 @@ impl<'input> StrWalker<'input> {
 		let mut nesting: usize = 1;
 
 		loop {
-			self.index += 1;
-
-			if self.reached_end() {
-				return Some(Err(LexErr::UnbalancedNestingErr {
-					start: start.to_string(),
-					end: end.to_string(),
-				}));
-			}
-
 			if !self.input.is_char_boundary(self.index) {
 				continue;
 			}
@@ -73,6 +72,15 @@ impl<'input> StrWalker<'input> {
 					return Some(Ok(str));
 				}
 			}
+
+			if self.reached_end() {
+				return Some(Err(LexErr::UnbalancedNestingErr {
+					start: start.to_string(),
+					end: end.to_string(),
+				}));
+			}
+
+			self.index += 1;
 		}
 	}
 
@@ -115,7 +123,7 @@ impl<'input> StrWalker<'input> {
 				continue;
 			};
 
-			if c.chars().next().is_some_and(|c| c.is_whitespace()) {
+			if c.chars().next().is_some_and(char::is_whitespace) {
 				og_index = self.index;
 			} else {
 				self.index = og_index;
