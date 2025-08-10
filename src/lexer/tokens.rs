@@ -185,5 +185,4 @@ pub enum Delimiter {
 	CurlyBraces,
 	Parentheses,
 	SquareBrackets,
-	AngleBrackets,
 }

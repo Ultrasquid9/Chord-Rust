@@ -71,7 +71,7 @@ impl FromStr for TokenTree {
 				if walker.currently_starts_with(str) {
 					// Ensuring identifiers containing keywords, such as "inner" or "main", are properly parsed
 					let keyword_valid = !current_ident.is_empty()
-						|| walker.nth_after(str.len()).is_some_and(is_xid_continue);
+						|| walker.nth_after(str.len()).is_none_or(is_xid_continue);
 					if let Token::Keyword(_) = token
 						&& keyword_valid
 					{
@@ -105,6 +105,7 @@ impl FromStr for TokenTree {
 			}
 		}
 
+		push_current_ident(&mut tokens, &mut current_ident);
 		Ok(TokenTree(tokens))
 	}
 }
@@ -175,6 +176,40 @@ mod tests {
 				Token::Literal(Literal::Bool(true)),
 				Token::Literal(Literal::String("Hello, World!".into())),
 				Token::Literal(Literal::Char('a'))
+			]))
+		)
+	}
+
+	#[test]
+	fn ident() {
+		let tt = "ident".parse::<TokenTree>();
+
+		assert_eq!(tt, Ok(TokenTree(vec![Token::Ident("ident".to_string())])))
+	}
+
+	#[test]
+	fn basic_funct() {
+		let tt = "funct inner(param: String) => print(param)".parse::<TokenTree>();
+
+		assert_eq!(
+			tt,
+			Ok(TokenTree(vec![
+				Token::Keyword(Keyword::Funct),
+				Token::Ident("inner".to_string()),
+				Token::Block {
+					delimiter: Delimiter::Parentheses,
+					tokentree: TokenTree(vec![
+						Token::Ident("param".to_string()),
+						Token::Symbol(Symbol::Colon),
+						Token::Ident("String".to_string()),
+					])
+				},
+				Token::Symbol(Symbol::BigArrow),
+				Token::Ident("print".to_string()),
+				Token::Block {
+					delimiter: Delimiter::Parentheses,
+					tokentree: TokenTree(vec![Token::Ident("param".to_string())])
+				},
 			]))
 		)
 	}
