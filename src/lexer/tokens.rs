@@ -75,7 +75,7 @@ pub const DELIMITER_MAP: &[(&str, &str, Delimiter)] = &[
 	("<", ">", Delimiter::AngleBrackets),
 ];
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Token {
 	Keyword(Keyword),
 	Symbol(Symbol),
@@ -154,9 +154,13 @@ pub enum Symbol {
 	Deref,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Literal {
 	String(String),
+	Char(char),
+	Bool(bool),
+	Int(i64),
+	Float(f64),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

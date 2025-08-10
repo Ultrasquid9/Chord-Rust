@@ -1,6 +1,7 @@
-use std::{error::Error, fmt::Display, str::FromStr};
+use std::{error::Error, fmt::Display, mem::take, str::FromStr};
 
 use tokens::Token;
+use unicode_ident::{is_xid_continue, is_xid_start};
 
 use crate::lexer::{
 	str_walker::StrWalker,
@@ -16,24 +17,33 @@ pub enum LexErr {
 	UnbalancedNestingErr { start: String, end: String },
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct TokenTree(Vec<Token>);
 
 impl FromStr for TokenTree {
 	type Err = LexErr;
 
 	fn from_str(input: &str) -> Result<Self, Self::Err> {
+		fn push_current_ident(tokens: &mut Vec<Token>, current_ident: &mut String) {
+			if !current_ident.is_empty() {
+				tokens.push(Token::Ident(take(current_ident)));
+			}
+		}
+
 		let mut walker = StrWalker::new(input);
 		let mut tokens = vec![];
+		let mut current_ident = String::new();
 
 		'lexing: while !walker.reached_end() {
 			walker.jump_whitespace();
 
 			// Comments
 			if walker.get_between_recursive("<#", "#>").is_some() {
+				push_current_ident(&mut tokens, &mut current_ident);
 				continue;
 			}
 			if walker.currently_starts_with("#") {
+				push_current_ident(&mut tokens, &mut current_ident);
 				walker.jump_to_next("\n");
 				continue;
 			}
@@ -44,6 +54,7 @@ impl FromStr for TokenTree {
 					continue;
 				};
 
+				push_current_ident(&mut tokens, &mut current_ident);
 				tokens.push(Token::Block {
 					delimiter: delimiter.clone(),
 					tokentree: str?.parse()?,
@@ -52,16 +63,38 @@ impl FromStr for TokenTree {
 				continue 'lexing;
 			}
 
-			// Tokens
+			// Keywords/Symbols
 			for (str, token) in TOKEN_MAP {
 				if walker.currently_starts_with(str) {
+					// Ensuring identifiers containing keywords, such as "inner" or "main", are properly parsed
+					let keyword_valid = !current_ident.is_empty()
+						|| walker.nth_after(str.len()).is_some_and(is_xid_continue);
+					if let Token::Keyword(_) = token
+						&& keyword_valid
+					{
+						continue;
+					}
+
+					push_current_ident(&mut tokens, &mut current_ident);
 					walker.jump_by(str.len());
 					tokens.push(token.clone());
 					continue 'lexing;
 				}
 			}
 
-			walker.next_char();
+			// Identifiers
+			let Some(ch) = walker.next_char() else {
+				continue;
+			};
+			if current_ident.is_empty() {
+				if is_xid_start(ch) {
+					current_ident.push(ch);
+				}
+			} else if is_xid_continue(ch) {
+				current_ident.push(ch);
+			} else {
+				push_current_ident(&mut tokens, &mut current_ident);
+			}
 		}
 
 		Ok(TokenTree(tokens))

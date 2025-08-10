@@ -34,6 +34,24 @@ impl<'input> StrWalker<'input> {
 		}
 	}
 
+	/// Gets the [char] starting at `target` bytes after the index
+	pub fn nth_after(&mut self, target: usize) -> Option<char> {
+		let mut target = self.index + target;
+		let og_target = target;
+
+		if !self.input.is_char_boundary(target) {
+			return None;
+		}
+
+		loop {
+			target += 1;
+
+			if self.input.is_char_boundary(target) {
+				return self.input.get(og_target..target)?.chars().next();
+			}
+		}
+	}
+
 	/// Whether or not the index has reached or passed the length of the [str].
 	pub fn reached_end(&self) -> bool {
 		self.index > self.input.len()
@@ -60,7 +78,7 @@ impl<'input> StrWalker<'input> {
 				continue;
 			}
 
-			if self.currently_starts_with(start) {
+			if self.currently_starts_with(start) && start != end {
 				nesting += 1;
 			} else if self.currently_starts_with(end) {
 				nesting -= 1;
@@ -103,7 +121,11 @@ impl<'input> StrWalker<'input> {
 	pub fn jump_by(&mut self, amount: usize) {
 		self.index += amount;
 
-		assert!(self.input.is_char_boundary(self.index), "{} is not a valid char boundary", self.index);
+		assert!(
+			self.input.is_char_boundary(self.index),
+			"{} is not a valid char boundary",
+			self.index
+		);
 	}
 
 	/// Increases the index until it reaches a char that is not whitespace
