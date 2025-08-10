@@ -127,7 +127,7 @@ impl Error for LexErr {}
 
 #[cfg(test)]
 mod tests {
-	use crate::lexer::tokens::{Delimiter, Keyword, Literal, Token};
+	use crate::lexer::tokens::{Delimiter, Keyword, Literal, Symbol, Token};
 
 	use super::TokenTree;
 
@@ -150,10 +150,8 @@ mod tests {
 					delimiter: Delimiter::Parentheses,
 					tokentree: TokenTree(vec![])
 				},
-				Token::Block {
-					delimiter: Delimiter::AngleBrackets,
-					tokentree: TokenTree(vec![])
-				},
+				Token::Symbol(Symbol::Smaller),
+				Token::Symbol(Symbol::Larger),
 			]))
 		)
 	}

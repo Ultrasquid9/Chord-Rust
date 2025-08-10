@@ -83,7 +83,6 @@ pub const DELIMITER_MAP: &[(&str, &str, Delimiter)] = &[
 	("{", "}", Delimiter::CurlyBraces),
 	("(", ")", Delimiter::Parentheses),
 	("[", "]", Delimiter::SquareBrackets),
-	("<", ">", Delimiter::AngleBrackets),
 ];
 
 #[derive(Debug, Clone, PartialEq)]

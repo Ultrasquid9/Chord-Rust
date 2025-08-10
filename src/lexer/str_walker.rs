@@ -50,6 +50,10 @@ impl<'input> StrWalker<'input> {
 		}
 
 		loop {
+			if target > self.input.len() {
+				return None;
+			}
+
 			target += 1;
 
 			if self.input.is_char_boundary(target) {
