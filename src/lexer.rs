@@ -100,6 +100,7 @@ impl FromStr for TokenTree {
 			} else if is_xid_continue(ch) {
 				current_ident.push(ch);
 			} else {
+				walker.jump_back(ch.len_utf8());
 				push_current_ident(&mut tokens, &mut current_ident);
 			}
 		}
@@ -126,7 +127,7 @@ impl Error for LexErr {}
 
 #[cfg(test)]
 mod tests {
-	use crate::lexer::tokens::{Delimiter, Keyword, Token};
+	use crate::lexer::tokens::{Delimiter, Keyword, Literal, Token};
 
 	use super::TokenTree;
 
@@ -162,5 +163,21 @@ mod tests {
 		let tt = "funct <# funct #>".parse::<TokenTree>();
 
 		assert_eq!(tt, Ok(TokenTree(vec![Token::Keyword(Keyword::Funct)])))
+	}
+
+	#[test]
+	fn literals() {
+		let tt = "123456 123.456 true \"Hello, World!\" \'a\'".parse::<TokenTree>();
+
+		assert_eq!(
+			tt,
+			Ok(TokenTree(vec![
+				Token::Literal(Literal::Int(123456)),
+				Token::Literal(Literal::Float(123.456)),
+				Token::Literal(Literal::Bool(true)),
+				Token::Literal(Literal::String("Hello, World!".into())),
+				Token::Literal(Literal::Char('a'))
+			]))
+		)
 	}
 }

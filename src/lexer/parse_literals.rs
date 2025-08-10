@@ -44,6 +44,10 @@ fn parse_numbers(walker: &mut StrWalker) -> Result<Literal, LexErr> {
 	let mut numstr = String::new();
 
 	loop {
+		if walker.reached_end() {
+			todo!("walker reached end");
+		}
+
 		let Some(ch) = walker.nth_after(bytes_after) else {
 			bytes_after += 1;
 			continue;

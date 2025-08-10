@@ -34,6 +34,12 @@ impl<'input> StrWalker<'input> {
 		}
 	}
 
+	/// Returns all text after the index
+	#[allow(unused)] // This is primarily for debug purposes, and isn't always needed
+	pub fn remainder(&self) -> &'input str {
+		&self.input[self.index..self.input.len()]
+	}
+
 	/// Gets the [char] starting at `target` bytes after the index
 	pub fn nth_after(&mut self, target: usize) -> Option<char> {
 		let mut target = self.index + target;
@@ -62,8 +68,6 @@ impl<'input> StrWalker<'input> {
 		start: &str,
 		end: &str,
 	) -> Option<Result<&'input str, LexErr>> {
-		self.jump_whitespace();
-
 		if self.currently_starts_with(start) {
 			self.jump_by(start.len());
 		} else {
@@ -74,7 +78,15 @@ impl<'input> StrWalker<'input> {
 		let mut nesting: usize = 1;
 
 		loop {
+			if self.reached_end() {
+				return Some(Err(LexErr::UnbalancedNestingErr {
+					start: start.to_string(),
+					end: end.to_string(),
+				}));
+			}
+
 			if !self.input.is_char_boundary(self.index) {
+				self.index += 1;
 				continue;
 			}
 
@@ -86,16 +98,9 @@ impl<'input> StrWalker<'input> {
 				let str = self.input.get(og_index..self.index)?;
 				self.jump_by(end.len());
 
-				if nesting == 0 {
+				if nesting == 0 || start == end {
 					return Some(Ok(str));
 				}
-			}
-
-			if self.reached_end() {
-				return Some(Err(LexErr::UnbalancedNestingErr {
-					start: start.to_string(),
-					end: end.to_string(),
-				}));
 			}
 
 			self.index += 1;

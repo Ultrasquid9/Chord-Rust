@@ -2,8 +2,8 @@ use crate::lexer::TokenTree;
 
 // Mildly hacky macro to reduce repetition in the token map
 macro_rules! token_map {
-	( $( $name:tt : $type:ident $token:ident ),+ $(,)? ) => {
-		&[ $( ($name, Token::$type($type::$token) ), )+ ]
+	( $( $name:tt : $type:ident $token:ident $($inner:expr)? ),+ $(,)? ) => {
+		&[ $( ($name, Token::$type($type::$token $( ($inner) )? ) ), )+ ]
 	};
 }
 
@@ -40,9 +40,13 @@ pub const TOKEN_MAP: &[(&str, Token)] = token_map! [
 	"yeet": Keyword Yeet,
 	"unsafe": Keyword Unsafe,
 
+	"true": Literal Bool true,
+	"false": Literal Bool false,
+
 	"->": Symbol Arrow,
 	"=>": Symbol BigArrow,
 	"|>": Symbol Pipe,
+	":": Symbol Colon,
 
 	"+": Symbol Add,
 	"-": Symbol Subtract,
