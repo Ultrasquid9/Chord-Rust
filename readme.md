@@ -15,30 +15,29 @@ Once Chord is further along, there are plans for native Rust interop, which will
 # Examples
 
 Here is a minimal "hello world" program in Chord:
-```
-funct main() => print("Hello, world!")
+```python
+fun main() => print("Hello, world!")
 ```
 
 And here is a fibonacci sequence calculator written in Chord:
-```
-funct main() {
+```python
+fun main() {
 	let target = 10
 	let prev = 0
 	let current = 1
 
-	let fib = fib(target, prev, current)
-	print_fib(target, fib)
+	fib(target, prev, current) |> print_fib(target, _)
 }
 
 # Calculates the fibonacci number for the target input
-funct fib(target: u32, prev: u32, current: u32) -> u32 => if target == 0 {
+fun fib(target: u32, prev: u32, current: u32) -> u32 => if target == 0 {
 	current
 } else {
 	fib(target - 1, current, prev + current)
 }
 
 # Prints out given fibonacci number, with proper formatting applied
-funct print_fib(target: u32, fib: u32) {
+fun print_fib(target: u32, fib: u32) {
 	let place = match target {
 		1 => "st"
 		2 => "nd"

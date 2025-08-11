@@ -8,7 +8,7 @@ macro_rules! token_map {
 }
 
 pub const TOKEN_MAP: &[(&str, Token)] = token_map! [
-	"funct": Keyword Funct,
+	"fun": Keyword Fun,
 	"struct": Keyword Struct,
 	"enum": Keyword Enum,
 	"alias": Keyword Alias,
@@ -35,10 +35,13 @@ pub const TOKEN_MAP: &[(&str, Token)] = token_map! [
 	"return": Keyword Return,
 
 	"mut": Keyword Mut,
-	"fun": Keyword Fun,
+	"funct": Keyword Funct,
 	"try": Keyword Try,
 	"yeet": Keyword Yeet,
 	"unsafe": Keyword Unsafe,
+	"and": Keyword And,
+	"or": Keyword Or,
+	"xor": Keyword Xor,
 
 	"true": Literal Bool true,
 	"false": Literal Bool false,
@@ -47,6 +50,8 @@ pub const TOKEN_MAP: &[(&str, Token)] = token_map! [
 	"=>": Symbol BigArrow,
 	"|>": Symbol Pipe,
 	":": Symbol Colon,
+	",": Symbol Comma,
+	".": Symbol Period,
 
 	"+": Symbol Add,
 	"-": Symbol Subtract,
@@ -99,7 +104,7 @@ pub enum Token {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Keyword {
-	Funct,
+	Fun,
 	Struct,
 	Enum,
 	Alias,
@@ -127,10 +132,13 @@ pub enum Keyword {
 
 	// Reserved keywords, may get an official use eventually
 	Mut,
-	Fun,
+	Funct,
 	Try,
 	Yeet,
 	Unsafe,
+	And,
+	Or,
+	Xor,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -139,6 +147,8 @@ pub enum Symbol {
 	BigArrow,
 	Pipe,
 	Colon,
+	Comma,
+	Period,
 
 	Add,
 	Subtract,

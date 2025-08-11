@@ -159,9 +159,9 @@ mod tests {
 
 	#[test]
 	fn comments() {
-		let tt = "funct <# funct #>".parse::<TokenTree>();
+		let tt = "fun <# fun #>".parse::<TokenTree>();
 
-		assert_eq!(tt, Ok(TokenTree(vec![Token::Keyword(Keyword::Funct)])))
+		assert_eq!(tt, Ok(TokenTree(vec![Token::Keyword(Keyword::Fun)])))
 	}
 
 	#[test]
@@ -188,13 +188,13 @@ mod tests {
 	}
 
 	#[test]
-	fn basic_funct() {
-		let tt = "funct inner(param: String) => print(param)".parse::<TokenTree>();
+	fn basic_fun() {
+		let tt = "fun inner(param: String) => print(param)".parse::<TokenTree>();
 
 		assert_eq!(
 			tt,
 			Ok(TokenTree(vec![
-				Token::Keyword(Keyword::Funct),
+				Token::Keyword(Keyword::Fun),
 				Token::Ident("inner".to_string()),
 				Token::Block {
 					delimiter: Delimiter::Parentheses,
