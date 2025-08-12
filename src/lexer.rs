@@ -1,4 +1,4 @@
-use std::{error::Error, fmt::Display, mem::take, str::FromStr};
+use std::{collections::VecDeque, error::Error, fmt::Display, mem::take, str::FromStr};
 
 use tokens::Token;
 use unicode_ident::{is_xid_continue, is_xid_start};
@@ -21,7 +21,42 @@ pub enum LexErr {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct TokenTree(Vec<Token>);
+pub struct TokenTree(VecDeque<Token>);
+
+impl TokenTree {
+	pub fn new(tokens: impl AsRef<[Token]>) -> Self {
+		Self(tokens.as_ref().to_vec().into())
+	}
+
+	/// Removes the first [`Token`] from the [`TokenTree`] and returns it.
+	pub fn pop(&mut self) -> Option<Token> {
+		self.0.pop_front()
+	}
+
+	/// Gets a reference to the given [`Token`], without removing it.
+	#[must_use]
+	pub fn get(&self, index: usize) -> Option<&Token> {
+		self.0.get(index)
+	}
+
+	/// Gets a reference to the first [`Token`] in the [`TokenTree`].
+	#[must_use]
+	pub fn first(&self) -> Option<&Token> {
+		self.get(0)
+	}
+
+	/// Returns the number of [`Tokens`](Token) present in the [`TokenTree`].
+	#[must_use]
+	pub fn len(&self) -> usize {
+		self.0.len()
+	}
+
+	/// Returns `true` if the [`TokenTree`] is empty.
+	#[must_use]
+	pub fn is_empty(&self) -> bool {
+		self.0.is_empty()
+	}
+}
 
 impl FromStr for TokenTree {
 	type Err = LexErr;
@@ -106,7 +141,7 @@ impl FromStr for TokenTree {
 		}
 
 		push_current_ident(&mut tokens, &mut current_ident);
-		Ok(TokenTree(tokens))
+		Ok(TokenTree(tokens.into()))
 	}
 }
 
@@ -138,18 +173,18 @@ mod tests {
 
 		assert_eq!(
 			tt,
-			Ok(TokenTree(vec![
+			Ok(TokenTree::new([
 				Token::Block {
 					delimiter: Delimiter::CurlyBraces,
-					tokentree: TokenTree(vec![])
+					tokentree: TokenTree::new([])
 				},
 				Token::Block {
 					delimiter: Delimiter::SquareBrackets,
-					tokentree: TokenTree(vec![])
+					tokentree: TokenTree::new([])
 				},
 				Token::Block {
 					delimiter: Delimiter::Parentheses,
-					tokentree: TokenTree(vec![])
+					tokentree: TokenTree::new([])
 				},
 				Token::Symbol(Symbol::Smaller),
 				Token::Symbol(Symbol::Larger),
@@ -161,7 +196,7 @@ mod tests {
 	fn comments() {
 		let tt = "fun <# fun #>".parse::<TokenTree>();
 
-		assert_eq!(tt, Ok(TokenTree(vec![Token::Keyword(Keyword::Fun)])))
+		assert_eq!(tt, Ok(TokenTree::new([Token::Keyword(Keyword::Fun)])))
 	}
 
 	#[test]
@@ -170,7 +205,7 @@ mod tests {
 
 		assert_eq!(
 			tt,
-			Ok(TokenTree(vec![
+			Ok(TokenTree::new([
 				Token::Literal(Literal::Int(123456)),
 				Token::Literal(Literal::Float(123.456)),
 				Token::Literal(Literal::Bool(true)),
@@ -184,7 +219,7 @@ mod tests {
 	fn ident() {
 		let tt = "ident".parse::<TokenTree>();
 
-		assert_eq!(tt, Ok(TokenTree(vec![Token::Ident("ident".to_string())])))
+		assert_eq!(tt, Ok(TokenTree::new([Token::Ident("ident".to_string())])))
 	}
 
 	#[test]
@@ -193,12 +228,12 @@ mod tests {
 
 		assert_eq!(
 			tt,
-			Ok(TokenTree(vec![
+			Ok(TokenTree::new([
 				Token::Keyword(Keyword::Fun),
 				Token::Ident("inner".to_string()),
 				Token::Block {
 					delimiter: Delimiter::Parentheses,
-					tokentree: TokenTree(vec![
+					tokentree: TokenTree::new([
 						Token::Ident("param".to_string()),
 						Token::Symbol(Symbol::Colon),
 						Token::Ident("String".to_string()),
@@ -208,7 +243,7 @@ mod tests {
 				Token::Ident("print".to_string()),
 				Token::Block {
 					delimiter: Delimiter::Parentheses,
-					tokentree: TokenTree(vec![Token::Ident("param".to_string())])
+					tokentree: TokenTree::new([Token::Ident("param".to_string())])
 				},
 			]))
 		)
