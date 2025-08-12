@@ -11,11 +11,11 @@ fun with_generics[T](param: T) {
 	# stuff here
 }
 
-fun with_lifetimes<lt>(param: ~lt i32) {
+fun with_lifetimes<lt>(param: lt ~i32) {
 	# stuff here
 }
 
-fun with_generics_and_lifetimes<lt>[T](param: ~lt T) {
+fun with_generics_and_lifetimes<lt>[T](param: lt ~T) {
 	# stuff here
 }
 #>

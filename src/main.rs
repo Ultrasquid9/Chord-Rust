@@ -9,7 +9,7 @@ pub mod lexer;
 #[derive(Debug)]
 pub enum TODO {}
 
-const TEST: &str = include_str!("../test.chr");
+const TEST: &str = include_str!("../test.ch");
 
 fn main() -> Result<(), Box<dyn Error>> {
 	let tt = TEST.parse::<TokenTree>()?;

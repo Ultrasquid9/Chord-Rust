@@ -35,13 +35,14 @@ pub const TOKEN_MAP: &[(&str, Token)] = token_map! [
 	"return": Keyword Return,
 
 	"mut": Keyword Mut,
-	"funct": Keyword Funct,
 	"try": Keyword Try,
 	"yeet": Keyword Yeet,
 	"unsafe": Keyword Unsafe,
 	"and": Keyword And,
 	"or": Keyword Or,
 	"xor": Keyword Xor,
+	"use": Keyword Use,
+	"public": Keyword Public,
 
 	"true": Literal Bool true,
 	"false": Literal Bool false,
@@ -52,6 +53,7 @@ pub const TOKEN_MAP: &[(&str, Token)] = token_map! [
 	":": Symbol Colon,
 	",": Symbol Comma,
 	".": Symbol Period,
+	"?": Symbol QuestionMark,
 
 	"+": Symbol Add,
 	"-": Symbol Subtract,
@@ -132,13 +134,14 @@ pub enum Keyword {
 
 	// Reserved keywords, may get an official use eventually
 	Mut,
-	Funct,
 	Try,
 	Yeet,
 	Unsafe,
 	And,
 	Or,
 	Xor,
+	Use,
+	Public,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -149,6 +152,7 @@ pub enum Symbol {
 	Colon,
 	Comma,
 	Period,
+	QuestionMark,
 
 	Add,
 	Subtract,
